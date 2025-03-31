@@ -1,0 +1,104 @@
+services:
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    env_file: .env
+    environment:
+      - USER_DB_HOST=user-db
+      - USER_DB_NAME=userdb
+      - USER_DB_USER=user
+      - USER_DB_PASSWORD=password
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - user_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${USER_SERVICE_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  task-service:
+    build: ./task-service
+    container_name: task-service
+    env_file: .env
+    environment:
+      - TASK_DB_HOST=task-db
+      - TASK_DB_NAME=taskdb
+      - TASK_DB_USER=task
+      - TASK_DB_PASSWORD=password
+    ports:
+      - "${TASK_SERVICE_PORT}:${TASK_SERVICE_PORT}"
+    depends_on:
+      task-db:
+        condition: service_healthy
+    networks:
+      - task_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${TASK_SERVICE_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    env_file: .env
+    ports:
+      - "8080:80"
+    networks:
+      - frontend_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  user-db:
+    image: postgres:13-alpine
+    container_name: user-db
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - user_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "userdb"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+
+  task-db:
+    image: postgres:13-alpine
+    container_name: task-db
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: task
+      POSTGRES_PASSWORD: password
+    volumes:
+      - task-db-data:/var/lib/postgresql/data
+    networks:
+      - task_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "task", "-d", "taskdb"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  user_network: {}
+  task_network: {}
+  frontend_network: {}
+
+volumes:
+  user-db-data: {}
+  task-db-data: {}

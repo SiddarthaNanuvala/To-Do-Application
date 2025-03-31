@@ -1,0 +1,16 @@
+stages:
+  - build
+
+
+build:
+  stage: build
+  image: node:18-alpine
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 hour
+
