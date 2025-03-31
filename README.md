@@ -65,7 +65,7 @@ The application follows a microservices architecture with the following componen
 
 1. Clone the repository:
 
-git clone https://github.com/yourusername/task-manager.git
+git clone https://github.com/SiddarthaNanuvala/task-manager.git
 
 2. Create required directories:
 
