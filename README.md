@@ -65,7 +65,7 @@ The application follows a microservices architecture with the following componen
 
 1. Clone the repository:
 
-git clone https://github.com/SiddarthaNanuvala/task-manager.git
+git clone https://github.com/SiddarthaNanuvala/To-Do-Application
 
 2. Create required directories:
 
